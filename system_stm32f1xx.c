@@ -20,25 +20,33 @@
 
 /*- Macros -------------------------------------------------------------------*/
 /*! Processor supports USB feature                                            */
-#define PROC_FEATURE_USB ( \
-  defined(STM32F102x6) || defined(STM32F102xB) || defined(STM32F103x6) || \
-  defined(STM32F103xB) || defined(STM32F103xE) || defined(STM32F103xG) \
-)
+#if defined(STM32F102x6) || defined(STM32F102xB) || defined(STM32F103x6) || \
+    defined(STM32F103xB) || defined(STM32F103xE) || defined(STM32F103xG) 
+  #define PROC_FEATURE_USB      1u  /* Supports USB feature                   */
+#else
+  #define PROC_FEATURE_USB      0u  /* Does not support USB feature           */
+#endif
 
 /*! Processor supports USB OTG FS feature                                     */
-#define PROC_FEATURE_OTGFS ( \
-  defined(STM32F105xC) || defined(STM32F107xC) \
-)
+#if defined(STM32F105xC) || defined(STM32F107xC)
+  #define PROC_FEATURE_OTGFS    1u  /* Supports USB OTG FS feature            */
+#else
+  #define PROC_FEATURE_OTGFS    0u  /* Does not support USB OTG FS feature    */
+#endif
 
 /*! Processor supports PLL2, PLL3 feature                                     */
-#define PROC_FEATURE_PLL23 ( \
-  defined(STM32F105xC) || defined(STM32F107xC) \
-)
+#if defined(STM32F105xC) || defined(STM32F107xC)
+  #define PROC_FEATURE_PLL23    1u  /* Supports PLL2 and PLL3 feature         */
+#else
+  #define PROC_FEATURE_PLL23    0u  /* Does not support PLL2 and PLL3 feature */
+#endif
 
 /*! Processor supports PREDIV1 feature                                        */
-#define PROC_FEATURE_PREDIV1 ( \
-  PROC_FEATURE_PLL23 || defined(STM32F100xB) || defined(STM32F100xE) \
-)
+#if PROC_FEATURE_PLL23 || defined(STM32F100xB) || defined(STM32F100xE)
+  #define PROC_FEATURE_PREDIV1  1u  /* Supports PREDIV1 feature               */
+#else
+  #define PROC_FEATURE_PREDIV1  0u  /* Does not support PREDIV1 feature       */
+#endif
 
 
 /*- Global variables ---------------------------------------------------------*/
