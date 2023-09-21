@@ -370,16 +370,11 @@ extern "C" {
 #include "stm32f1xx_hal_mmc.h"
 #endif /* HAL_MMC_MODULE_ENABLED */
 
-#ifdef USE_FULL_ASSERT
+/*- Assert macro redirection -------------------------------------------------*/
 #include "stm32f1xx_ll_assert.h"
-#endif /* USE_FULL_ASSERT */
-
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __STM32F1xx_HAL_CONF_H */
-
-
-
