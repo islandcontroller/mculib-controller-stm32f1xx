@@ -191,5 +191,6 @@ _vector_base:
 .section  .text.Default_Handler
 .balign 4
 .globl  Default_Handler
+.type   Default_Handler, %function
 Default_Handler:
   b     Default_Handler
