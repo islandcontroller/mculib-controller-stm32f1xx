@@ -6,10 +6,25 @@
  * Common section layout definitions across all controller types
  *
  * @date  18.08.2023
+ * @date  13.10.2025  Added heap/stack space reservation; configuration options
  ******************************************************************************/
 
 /* Entry Point assignment                                                     */
 ENTRY(_start)
+
+
+/* Reserved bootloader space at the start of FLASH                            */
+__boot_size = DEFINED(__boot_size) ? __boot_size : 0;
+ASSERT((ALIGN(__boot_size, 64)-__boot_size) == 0, "__boot_size must be multiple of 64")
+
+/* Reserved space for heap                                                    */
+__min_heap_size = DEFINED(__min_heap_size) ? __min_heap_size : 0;
+ASSERT((ALIGN(__min_heap_size, 4)-__min_heap_size) == 0, "__min_heap_size must be multiple of 4")
+
+/* Reserved space for stack                                                   */
+__stack_size = DEFINED(__stack_size) ? __stack_size : 256;
+ASSERT((ALIGN(__stack_size, 4)-__stack_size) == 0, "__stack_size must be multiple of 4")
+
 
 /* Sections definition                                                        */
 SECTIONS
@@ -104,35 +119,22 @@ SECTIONS
     *(.bss)
     *(.bss*)
     *(COMMON*)
-    
+
     . = ALIGN(4);
     _ebss = .;
-    PROVIDE( end = . );    
+    PROVIDE( end = . );
     
   } >RAM
   
-  /* Stack/Heap collision detection                       */
-  .heap (NOLOAD) :
-  {
-    . = ALIGN(4);
-    _sheap = .;
-    
-    /* Calculate available heap size                      */
-    __avail_heap_size = LENGTH(RAM) - __stack_size - (_sheap - ORIGIN(RAM));
-    
-    . = . + MAX(__min_heap_size, __avail_heap_size);
-    . = ALIGN(4);
-    _eheap = .;
-  } >RAM
-  
-  /* Stack at the end of RAM                              */
-  .stack (NOLOAD) :
-  {
-    . = ALIGN(4);
-    _sstack = .;
-    . = . + __stack_size;
-    _estack = .;
-  } >RAM
+  /* Stack allocation at end of RAM                       */
+  PROVIDE(_estack = ORIGIN(RAM) + LENGTH(RAM));
+  PROVIDE(_sstack = _estack - __stack_size);
+  ASSERT(_sstack > _ebss, "Insufficient space for stack allocation")
+
+  /* Heap allocation between bss and stack                */
+  PROVIDE(_sheap = _ebss);
+  PROVIDE(_eheap = _sstack);
+  ASSERT((_eheap - _sheap) >= __min_heap_size, "Insufficient space for heap allocation")
 
   /* Remove standard libraries                            */
   /DISCARD/ :
